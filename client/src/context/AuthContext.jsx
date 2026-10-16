@@ -26,14 +26,14 @@ export function AuthProvider({ children }) {
     async function checkAuth() {
       try {
         const response = await getCurrentUser();
+        const currentUser =
+          response.data?.user ?? response.user ?? null;
 
         if (isMounted) {
-          const currentUser = response.data?.user ?? response.user ?? null;
-
           setUser(currentUser);
           setIsAuthenticated(Boolean(currentUser));
         }
-      } catch (error) {
+      } catch {
         if (isMounted) {
           setUser(null);
           setIsAuthenticated(false);
@@ -52,26 +52,23 @@ export function AuthProvider({ children }) {
     };
   }, []);
 
+  // Signup creates an account; it does NOT log the user in.
   async function signup(userData) {
-    const response = await registerUser(userData);
-    const newUser = response.data?.user ?? response.user ?? null;
-
-    if (newUser) {
-      setUser(newUser);
-      setIsAuthenticated(true);
-    }
-
-    return response;
+    return await registerUser(userData);
   }
 
+  // Only successful login authenticates the user.
   async function login(credentials) {
     const response = await loginUser(credentials);
-    const loggedInUser = response.data?.user ?? response.user ?? null;
+    const loggedInUser =
+      response.data?.user ?? response.user ?? null;
 
-    if (loggedInUser) {
-      setUser(loggedInUser);
-      setIsAuthenticated(true);
+    if (!loggedInUser) {
+      throw new Error("Login succeeded but no user data was returned.");
     }
+
+    setUser(loggedInUser);
+    setIsAuthenticated(true);
 
     return response;
   }
@@ -108,6 +105,5 @@ export function useAuth() {
   if (context === null) {
     throw new Error("useAuth must be used inside an AuthProvider");
   }
-
   return context;
 }

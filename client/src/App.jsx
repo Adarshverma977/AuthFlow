@@ -1,4 +1,6 @@
+
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 
 import { AuthProvider, useAuth } from "./context/AuthContext";
 
@@ -29,7 +31,11 @@ function AppRoutes() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
-        <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
+        <Route
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated} />
+          }
+        >
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<Profile />} />
         </Route>
@@ -53,6 +59,24 @@ function AppRoutes() {
 function App() {
   return (
     <BrowserRouter>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3500,
+          style: {
+            borderRadius: "14px",
+            padding: "16px",
+            fontSize: "14px",
+          },
+          success: {
+            iconTheme: {
+              primary: "#16a34a",
+              secondary: "#ffffff",
+            },
+          },
+        }}
+      />
+
       <AuthProvider>
         <AppRoutes />
       </AuthProvider>

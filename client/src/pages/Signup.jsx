@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 import { useAuth } from "../context/AuthContext";
 import Input from "../components/common/Input";
@@ -19,7 +20,6 @@ function Signup() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -29,14 +29,27 @@ function Signup() {
       [name]: value,
     }));
 
-    setError("");
-    setSuccess("");
+    if (error) {
+      setError("");
+    }
   }
 
   async function handleSubmit(event) {
     event.preventDefault();
     setError("");
-    setSuccess("");
+
+    const name = formData.name.trim();
+    const email = formData.email.trim();
+
+    if (
+      !name ||
+      !email ||
+      !formData.password ||
+      !formData.confirmPassword
+    ) {
+      setError("Please fill in all fields.");
+      return;
+    }
 
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match.");
@@ -47,14 +60,16 @@ function Signup() {
 
     try {
       await signup({
-        name: formData.name.trim(),
-        email: formData.email.trim(),
+        name,
+        email,
         password: formData.password,
       });
 
-      setSuccess("Account created successfully!");
+      toast.success("Account created successfully! Please login.");
 
-      navigate("/dashboard", { replace: true });
+      navigate("/login", {
+        replace: true,
+      });
     } catch (error) {
       setError(
         error.response?.data?.message ||
@@ -95,7 +110,9 @@ function Signup() {
               <span className="signup-benefit-check">✓</span>
               <div>
                 <strong>Simple account management</strong>
-                <span>Keep your account details in one place.</span>
+                <span>
+                  Keep your account details in one place.
+                </span>
               </div>
             </div>
 
@@ -103,7 +120,9 @@ function Signup() {
               <span className="signup-benefit-check">✓</span>
               <div>
                 <strong>Security-focused access</strong>
-                <span>Designed with secure authentication in mind.</span>
+                <span>
+                  Designed with secure authentication in mind.
+                </span>
               </div>
             </div>
 
@@ -111,7 +130,9 @@ function Signup() {
               <span className="signup-benefit-check">✓</span>
               <div>
                 <strong>Your profile, your control</strong>
-                <span>Access and manage your personal information.</span>
+                <span>
+                  Access and manage your personal information.
+                </span>
               </div>
             </div>
           </div>
@@ -151,15 +172,10 @@ function Signup() {
               </p>
             )}
 
-            {success && (
-              <p className="success-message" role="status">
-                {success}
-              </p>
-            )}
-
             <Input
               label="Full name"
               name="name"
+              type="text"
               value={formData.name}
               onChange={handleChange}
               placeholder="Enter your full name"
@@ -200,7 +216,11 @@ function Signup() {
               required
             />
 
-            <Button type="submit" loading={isLoading}>
+            <Button
+              type="submit"
+              loading={isLoading}
+              disabled={isLoading}
+            >
               Create Account <span aria-hidden="true">→</span>
             </Button>
 

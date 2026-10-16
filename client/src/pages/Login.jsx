@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
 import Input from "../components/common/Input";
@@ -9,6 +9,8 @@ import Button from "../components/common/Button";
 function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
+
+  const location = useLocation();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -119,6 +121,11 @@ function Login() {
           </Link>
 
           <div className="login-form-heading">
+            {location.state?.message && (
+              <p className="success-message" role="status">
+                {location.state.message}
+              </p>
+            )}
             <span className="login-form-kicker">WELCOME BACK</span>
             <h2>Sign in to AuthFlow</h2>
             <p>

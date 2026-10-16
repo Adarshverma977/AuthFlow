@@ -10,9 +10,9 @@ Development:
 
 ### 2.1 Register User
 
-- Method: POST
-- Endpoint: `/auth/register`
-- Authentication: Not required
+- **Method:** `POST`
+- **Endpoint:** `/auth/register`
+- **Authentication:** Not required
 
 Request body:
 
@@ -24,17 +24,21 @@ Request body:
 }
 ```
 
-Expected behavior:
-- Validate all required fields.
-- Reject an already registered email.
-- Hash the password before saving.
-- Return a success response without exposing the password or password hash.
+Expected behaviour:
+
+- Validate registration input.
+- Reject duplicate email addresses.
+- Hash the password before storing the user.
+- Return a successful registration response without exposing the password hash.
+- Registration does not automatically log the user in; the user must log in separately.
+
+Success status: `201 Created`.
 
 ### 2.2 Login User
 
-- Method: POST
-- Endpoint: `/auth/login`
-- Authentication: Not required
+- **Method:** `POST`
+- **Endpoint:** `/auth/login`
+- **Authentication:** Not required
 
 Request body:
 
@@ -45,52 +49,60 @@ Request body:
 }
 ```
 
-Expected behavior:
-- Verify the credentials.
-- Set an HTTP-only authentication cookie on success.
+Expected behaviour:
+
+- Validate the submitted credentials.
+- Set the authentication JWT in an HTTP-only cookie on successful login.
 - Return the authenticated user's safe profile data.
-- Reject invalid credentials.
+- Reject incorrect credentials.
+
+The cookie is configured with `HttpOnly`, `SameSite=Lax`, a root path, and a 24-hour maximum age. The `Secure` flag is enabled when `NODE_ENV=production`.
 
 ### 2.3 Logout User
 
-- Method: POST
-- Endpoint: `/auth/logout`
-- Authentication: Authenticated session required
+- **Method:** `POST`
+- **Endpoint:** `/auth/logout`
+- **Authentication:** Required
 
-Expected behavior:
-- Clear the authentication cookie using matching cookie settings.
-- Clear the frontend's local authentication state.
+Expected behaviour:
+
+- Clear the authentication cookie.
+- Clear the frontend authentication state.
+- Return an appropriate response after logout.
 
 ### 2.4 Get Current User
 
-- Method: GET
-- Endpoint: `/auth/me`
-- Authentication: Required
+- **Method:** `GET`
+- **Endpoint:** `/auth/me`
+- **Authentication:** Required
 
-Expected behavior:
-- Verify the JWT.
-- Return the currently authenticated user's safe profile data.
-- Reject requests with missing, invalid, or expired tokens.
+Expected behaviour:
+
+- Read the authentication token from the cookie.
+- Verify the token through the authentication middleware.
+- Return the current user's safe profile data.
+- Reject unauthenticated requests.
 
 ## 3. User APIs
 
 ### 3.1 Get Profile
 
-- Method: GET
-- Endpoint: `/users/profile`
-- Authentication: Required
+- **Method:** `GET`
+- **Endpoint:** `/users/profile`
+- **Authentication:** Required
 
-Expected behavior:
+Expected behaviour:
+
 - Return the authenticated user's profile.
-- Never allow access to another user's private profile through user-controlled identifiers.
+- Restrict access to the authenticated user's own profile.
 
 ### 3.2 Update Profile
 
-- Method: PATCH
-- Endpoint: `/users/profile`
-- Authentication: Required
+- **Method:** `PATCH`
+- **Endpoint:** `/users/profile`
+- **Authentication:** Required
 
-Request body:
+Example request body:
 
 ```json
 {
@@ -98,53 +110,59 @@ Request body:
 }
 ```
 
-Expected behavior:
-- Validate permitted fields.
-- Update only the authenticated user's profile.
-- Reject unexpected or unauthorized fields.
+Expected behaviour:
 
-## 4. Common HTTP Status Codes
+- Validate permitted update fields.
+- Update the authenticated user's profile.
+- Do not allow users to modify another user's profile.
 
-- `200 OK`: Request successful.
-- `201 Created`: User successfully registered.
-- `400 Bad Request`: Invalid input.
-- `401 Unauthorized`: Missing or invalid authentication, or invalid credentials.
-- `403 Forbidden`: Authenticated user lacks required permission.
-- `409 Conflict`: Duplicate email registration.
-- `500 Internal Server Error`: Unexpected server failure.
+Confirm the exact allowed fields against the profile validation schema before extending this example.
 
-Exact status codes will be standardized during implementation.
+## 4. Health Check
 
-## 5. Error Response Format
+- **Method:** `GET`
+- **Endpoint:** `/health`
+- **Authentication:** Not required
 
-Planned format:
+Used to check whether the API server is responding.
 
-```json
-{
-  "success": false,
-  "message": "A descriptive error message"
-}
-```
+## 5. Common HTTP Status Codes
 
-Successful responses will use a consistent format as well.
+| Status | Meaning |
+|---|---|
+| `200 OK` | Request completed successfully |
+| `201 Created` | User registration succeeded |
+| `400 Bad Request` | Invalid request input, where returned by the API |
+| `401 Unauthorized` | Authentication failed or is required |
+| `403 Forbidden` | Access denied, where applicable |
+| `409 Conflict` | Duplicate resource, if implemented with this status |
+| `500 Internal Server Error` | Unexpected server error |
 
-## 6. Cookie and CORS Requirements
+The exact status returned for each error depends on the backend controller, validation middleware, and centralized error handler.
 
-- The authentication cookie will use `HttpOnly`.
-- `Secure` will be enabled in production.
-- `SameSite` will be configured according to the deployment topology.
-- The frontend will send credentials where required.
-- The backend will allow only trusted frontend origins when credentials are enabled.
+## 6. Authentication and Cookie Configuration
+
+- Authentication uses a JWT stored in an HTTP-only cookie.
+- The frontend must send credentials with API requests that depend on the cookie.
+- The backend enables credentialed CORS for the configured frontend origin.
+- The cookie uses `SameSite=Lax`.
+- The `Secure` flag is enabled in production.
+- JWT signing uses the secret configured through the backend environment variables.
+
+For production deployment, configure trusted frontend origins, strong private secrets, HTTPS, and compatible cookie settings for the deployed frontend and backend.
 
 ## 7. Testing Checklist
 
-- Register with valid data.
+- Register with valid details.
 - Reject duplicate email addresses.
-- Reject invalid registration data.
-- Login with valid credentials.
+- Reject invalid registration input.
+- Login with correct credentials.
 - Reject incorrect credentials.
-- Access protected endpoints without a cookie.
-- Access protected endpoints with an invalid or expired token.
-- Logout and verify the browser cookie is cleared.
+- Confirm signup redirects to login without authenticating the user.
+- Access protected endpoints with and without a valid cookie.
+- Confirm logout clears the session.
+- Retrieve the current authenticated user.
 - Retrieve and update the authenticated user's profile.
-- Verify one user cannot access another user's private data.
+- Verify unauthorized access is rejected.
+
+Document test cases as passed only when they have actually been executed.

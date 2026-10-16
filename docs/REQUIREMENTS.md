@@ -101,12 +101,17 @@ These may be considered as future enhancements.
 
 ## 8. Definition of Done
 
-The project will be considered complete when:
+The core authentication implementation is considered complete when:
 
 - Registration and login work correctly.
 - Passwords are securely hashed.
+- Duplicate email addresses and invalid inputs are handled.
+- Signup redirects to login without automatically authenticating the user.
 - Protected endpoints reject unauthenticated requests.
-- Logout invalidates the browser's authentication cookie.
-- Users can access and update only their own permitted profile data.
-- Core flows have automated tests.
-- Frontend and backend are documented and deployed.
+- Logout clears the browser's authentication cookie and frontend authentication state.
+- Users can access and update only their permitted profile data.
+- Frontend production build succeeds.
+- Core authentication flows have been tested.
+- Project setup, API, architecture, and testing documentation are maintained.
+
+Automated test coverage and production deployment must be verified separately before claiming those milestones are complete.

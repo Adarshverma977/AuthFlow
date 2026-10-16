@@ -7,7 +7,7 @@ Install the following tools before starting:
 - Node.js (LTS version)
 - npm
 - Git
-- Visual Studio Code
+- Visual Studio Code or another code editor
 - MongoDB local installation or a MongoDB Atlas database
 - Postman for API testing
 
@@ -20,8 +20,6 @@ npm -v
 
 ## 2. Project Structure
 
-The project uses separate directories for the frontend, backend, and documentation.
-
 ```text
 AuthFlow/
 ├── client/
@@ -31,35 +29,74 @@ AuthFlow/
 └── README.md
 ```
 
+The frontend, backend, and project documentation are maintained separately.
+
 ## 3. Environment Configuration
 
-The backend will use a `.env` file for sensitive configuration.
+Create the backend environment file at `server/.env` and configure the variables required by the application.
 
-Planned variables:
+Example development configuration:
 
 ```env
 PORT=5000
 MONGODB_URI=your_mongodb_connection_string
 JWT_SECRET=your_long_random_secret
+JWT_EXPIRES_IN=1d
 CLIENT_URL=http://localhost:5173
 NODE_ENV=development
 ```
 
-Replace placeholder values with your own configuration. Never commit real secrets to Git.
+Use the variable names expected by the backend configuration. Replace placeholders with your own values.
+
+**Security:**
+- Never commit real environment secrets to Git.
+- Use a strong, unique JWT secret.
+- Do not expose backend secrets in frontend environment variables.
+- Keep production credentials separate from development credentials.
 
 ## 4. Backend Setup
 
-Backend installation and start commands will be documented after the Express server is initialized.
+Open a terminal in the project root and navigate to the backend:
 
-The backend is expected to run at:
+```bash
+cd server
+npm install
+```
+
+Configure `server/.env` before starting the server.
+
+Start the backend using the script defined in `server/package.json`. For example, if the project provides a `dev` script:
+
+```bash
+npm run dev
+```
+
+The expected development API address is:
 
 `http://localhost:5000`
 
+Health check:
+
+`GET http://localhost:5000/api/health`
+
 ## 5. Frontend Setup
 
-The React frontend will be configured using Vite.
+Open a second terminal from the project root:
 
-Development URL:
+```bash
+cd client
+npm install
+```
+
+Configure the frontend API base URL using the environment variable expected by the client code, if required.
+
+Start the Vite development server using the script defined in `client/package.json`:
+
+```bash
+npm run dev
+```
+
+The default development URL is:
 
 `http://localhost:5173`
 
@@ -67,45 +104,65 @@ Development URL:
 
 Configure either a local MongoDB instance or a MongoDB Atlas database.
 
-The backend will connect using the `MONGODB_URI` environment variable.
+- Ensure the database is running or reachable.
+- Set `MONGODB_URI` in `server/.env`.
+- For Atlas, configure appropriate database credentials and network access.
+- Never commit database credentials to version control.
 
 ## 7. Authentication Configuration
 
-The frontend and backend will be configured for cookie-based authentication.
+AuthFlow uses JWT-based authentication through an HTTP-only cookie.
 
 During development:
-- Allow the trusted local frontend origin.
-- Configure credentialed requests where required.
-- Configure cookie settings consistently.
 
-Production configuration will be documented after deployment.
+- Configure `CLIENT_URL` to match the frontend origin.
+- Ensure the frontend sends credentials with requests that require cookie-based authentication.
+- Ensure the backend enables credentialed CORS for the configured origin.
+- Verify that cookie settings are compatible with the local development environment.
+
+The authentication cookie uses `SameSite=Lax` and a root path. Its `Secure` flag is enabled when `NODE_ENV=production`.
 
 ## 8. Running the Application
 
-The frontend and backend will run in separate terminals during development.
+Run the backend and frontend in separate terminals.
 
-Exact commands will be added once their `package.json` files and entry points are created.
+1. Start MongoDB or confirm the Atlas database is accessible.
+2. Start the backend from `server/`.
+3. Start the frontend from `client/`.
+4. Open the frontend development URL in your browser.
+5. Test registration, login, protected routes, profile access, and logout.
+
+Use the scripts listed in each package's `package.json` if their names differ from the examples above.
 
 ## 9. Troubleshooting
 
 ### Backend cannot connect to MongoDB
-- Check the connection string.
+- Check `MONGODB_URI`.
 - Confirm the database is running or reachable.
-- Verify Atlas network access if using Atlas.
+- Verify Atlas network access and credentials if using Atlas.
 
 ### Frontend API requests fail
 - Confirm the backend is running.
-- Verify the API base URL.
-- Check CORS and credential settings.
+- Verify the frontend API base URL.
+- Check the `CLIENT_URL` value and CORS configuration.
+- Inspect the browser console and network requests.
 
 ### Authentication cookie is missing
-- Check browser cookie settings.
-- Verify the frontend request includes credentials.
-- Verify the backend sets the cookie correctly.
+- Confirm the login request succeeds.
+- Verify the backend sets the cookie.
+- Confirm frontend requests include credentials where required.
+- Check browser cookie settings and the browser's developer tools.
+
+### Environment configuration is not applied
+- Confirm the environment file is in the correct directory.
+- Verify the variable names against the code.
+- Restart the relevant development server after changing environment variables.
 
 ## 10. Security Notes
 
-- Keep `.env` out of version control.
+- Keep `.env` files out of version control.
 - Never expose the JWT secret in frontend code.
-- Use HTTPS and secure cookies in production.
+- Use HTTPS and appropriate secure cookie settings in production.
 - Do not store passwords in plain text.
+- Restrict production CORS to trusted frontend origins.
+- Never share private keys, JWT secrets, or database credentials.

@@ -120,6 +120,8 @@ Exact middleware order will depend on the endpoint.
 
 ## 11. Deployment Architecture
 
-The React frontend, Express API, and MongoDB database may be hosted separately.
+The React frontend, Express API, and MongoDB database can be hosted separately.
 
-Environment variables will configure the API URL, database connection, JWT secret, and production cookie behavior. Production CORS and credential settings must match the deployed frontend origin.
+Environment variables configure the API URL, database connection, JWT secret, and production cookie behaviour. Production CORS settings must allow the deployed frontend origin, and credential settings must be compatible with the authentication cookie configuration.
+
+Before deployment, verify HTTPS, production environment variables, database access restrictions, cookie behaviour, and error handling in the target hosting environment.

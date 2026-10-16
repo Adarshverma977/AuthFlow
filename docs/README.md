@@ -1,17 +1,32 @@
 # AuthFlow — Secure Authentication System
 
-A full-stack authentication application built using the MERN stack, focusing on secure user authentication, protected routes, and backend security best practices.
+AuthFlow is a full-stack authentication application built using the MERN stack. It demonstrates secure user authentication, protected routes, user profile management, input validation, and centralized error handling.
 
 ## Features
 
-- User registration and login
-- Secure password hashing with bcrypt
+### Authentication
+- User registration with input validation
+- Duplicate email and invalid input handling
+- Secure password hashing using bcrypt
+- Login with credential validation
 - JWT-based authentication using HTTP-only cookies
-- Protected routes and user dashboard
-- User profile retrieval and updates
-- Input validation and centralized error handling
-- Authentication API testing
-- Responsive React frontend
+- Logout and session clearing
+- Protected Dashboard and Profile routes
+- Current authenticated user retrieval
+
+### User Experience
+- Signup success notifications
+- Login success and error feedback
+- Loading states and API error handling
+- Authentication-aware navigation
+- Responsive React interface
+
+### Backend Security
+- Request validation
+- Centralized error handling
+- Authentication middleware for protected endpoints
+- Environment-based configuration
+- CORS and cookie configuration
 
 ## Tech Stack
 
@@ -19,6 +34,9 @@ A full-stack authentication application built using the MERN stack, focusing on 
 - React
 - JavaScript
 - HTML and CSS
+- Vite
+- React Router
+- React Hot Toast
 
 ### Backend
 - Node.js
@@ -28,7 +46,7 @@ A full-stack authentication application built using the MERN stack, focusing on 
 - JSON Web Token (JWT)
 - bcrypt
 
-### Tools
+### Development and Testing Tools
 - Git and GitHub
 - Postman
 - Jest and Supertest
@@ -38,30 +56,47 @@ A full-stack authentication application built using the MERN stack, focusing on 
 ```text
 AuthFlow/
 ├── client/
+│   ├── src/
+│   ├── package.json
+│   └── README.md
 ├── server/
 ├── docs/
-├── .gitignore
-└── README.md
+│   ├── API_DOCUMENTATION.md
+│   ├── ARCHITECTURE.md
+│   ├── README.md
+│   ├── REQUIREMENTS.md
+│   ├── SETUP_GUIDE.md
+│   └── TESTING_GUIDE.md
+└── .gitignore
 ```
 
 ## Getting Started
 
-Installation and configuration instructions will be added as the project setup progresses.
+Refer to [SETUP_GUIDE.md](./SETUP_GUIDE.md) for installation, environment configuration, and instructions for running the application locally.
 
 ## Documentation
 
-Detailed project requirements, architecture, API documentation, setup instructions, and testing guides will be maintained in the `docs/` directory.
+- [API Documentation](./API_DOCUMENTATION.md)
+- [Architecture](./ARCHITECTURE.md)
+- [Requirements](./REQUIREMENTS.md)
+- [Setup Guide](./SETUP_GUIDE.md)
+- [Testing Guide](./TESTING_GUIDE.md)
 
-## Security
+## Security Notes
 
-- Passwords will be stored as hashes, never as plain text.
-- Sensitive credentials will be kept in environment variables.
-- Protected endpoints will verify authentication.
-- Cookies and cross-origin requests will be configured securely.
+- Passwords are stored as hashes rather than plain text.
+- Sensitive credentials are configured through environment variables.
+- Protected endpoints use authentication middleware.
+- JWT authentication uses HTTP-only cookies.
+- CORS and cookie settings are configured for the application environment.
+
+Keep production secrets private. Configure strong secrets and production-specific cookie and CORS settings before deployment.
 
 ## Project Status
 
-In Development 🚧
+**Core authentication flow implemented.**
+
+Registration, login, logout, protected routes, authentication feedback, and the main user flows have been tested. Refer to the testing guide for the documented test coverage.
 
 ## Author
 
